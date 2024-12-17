@@ -1,0 +1,33 @@
+{{>layouts/header}}
+<div class="conatainer mt-f">
+    <ul class="list-group">
+        {{#newsPage.content}}
+            <li class="list-group-item">
+                <h4 class="mb-2"><a href="/news/{{newsId}}"> 제목 : {{title}} </a></h4>
+                <small class="text-muted">News ID:{{newsId}}</small>
+            </li>
+        {{/newsPage.content}}
+        <a href="/news/new">Create News</a>
+        <ul class="pagination justify-content-center">
+            <li class="page-item {{^hasPrev}}disabled{{/hasPrev}}">
+<!--            {{#hasPrev}}-->
+                <a class="page-link" href="?page={{prev}}"
+                tabindex="-1" aria-disabled="true">Previous
+                </a>
+            </li>
+<!--            {{/hasPrev}}-->
+<!--            {{#hasNext}}-->
+            {{#pageNumbers}}
+                <li class="page-item {{#isCurrentPage}}active{{/isCurrentPage}}">
+                    <a class="page-link" href="?page={{next}}"
+                    tabindex="-1" aria-disabled="true">Next
+                    </a>
+                </li>
+            {{/pageNumbers}}
+<!--            {{/hasNext}}-->
+
+        </ul>
+    </ul>
+</div>
+{{>layouts/footer}}
+
