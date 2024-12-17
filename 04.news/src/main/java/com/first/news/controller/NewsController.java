@@ -8,9 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -37,7 +39,7 @@ public class NewsController {
     @GetMapping("/{newsId}")
     public String getNews(@PathVariable("newsId")Long newsId, Model model) {
         News news = newsRepository.findById(newsId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 뉴스가 존재하지 않습니다."));
         model.addAttribute("news", news);
         return "news/detail";
     }
@@ -67,5 +69,31 @@ public class NewsController {
         model.addAttribute("hasNext", newsPage.hasNext());
         model.addAttribute("hasPrev", newsPage.hasPrevious());
         return "news/list";
+    }
+
+    @GetMapping("/{newsId}/edit")
+    public String editNewsForm(@PathVariable("newsId") Long newsId, Model model) {
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 뉴스가 존재하지 않습니다."));
+        model.addAttribute("news", news);
+        return "news/edit";
+    }
+
+    @PostMapping("/{newsId}/update")
+    public String editNews(@PathVariable("newsId") Long newsId, NewsDto.Patch patch) {
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 뉴스가 존재하지 않습니다."));
+//        news.setTitle(patch.getTitle());
+//        news.setContent(patch.getContent());
+        mapper.patchDtoToNews(patch, news);
+        newsRepository.save(news);
+
+        return "redirect:/news/" + news.getNewsId();
+    }
+
+    @GetMapping("/{newsId}/delte")
+    public String deleteNews(@PathVariable("newsId") Long newsId) {
+        newsRepository.deleteById(newsId);
+        return "redirect:/news/list";
     }
 }
